@@ -118,6 +118,5 @@ def chart6():
     """
     return render_template('notdash2.html', graphJSON=graphJSON, header=header,description=description)
 
-if __name__ == '__main__':
-
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
