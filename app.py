@@ -55,7 +55,7 @@ def pie_chart():
     df = pd.DataFrame(data, columns=columns)
 
     pie_chart = graphics.Pie_chart(dimesion)
-    graphJSON = pie_chart.create_chart(df, 'Penguin by {}'.format(params['column']))
+    graphJSON = pie_chart.create_chart(df, 'Penguin by {}'.format(params['column1']))
     header="Grafica de pastel"
     description = ""
     return render_template('graphic.html', graphJSON=graphJSON, header=header,description=description)
