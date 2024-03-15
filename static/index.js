@@ -16,7 +16,7 @@ function removeOptions() {
 async function plotchart(id){
     removeOptions();
     document.getElementById("formtitle").textContent = document.getElementById(id).textContent;
-    let response = await axios.get("/var_getter");
+    let response = await axios.get("/var_getter", {params: {"id": id}});
     if(response.status == 200){
         for(let i = 0; i < response.data.columns.length; i++){
             let option = response.data.columns[i];

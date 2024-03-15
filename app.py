@@ -13,6 +13,10 @@ cursor = connection.get_cursor(conn)
 table_name = 'awaq'
 columns = connection.get_colums_names(cursor, table_name)
 
+column_exceptions = {
+    "bubble_chart": ["awaq_date", "awaq_common_name", "awaq_family"],
+    "trendline_chart": ["awaq_date"]
+}
 
 @app.route('/', methods=['GET'])
 def index():
@@ -53,10 +57,66 @@ def pie_chart():
     description = ""
     return render_template('graphic.html', graphJSON=graphJSON, header=header,description=description)
 
+@app.route('/heat_map', methods=['GET'])
+def heat_map():
+    longitude = 'awaq_longitude'
+    latitude = 'awaq_latitude'
+    describer = 'awaq_id'
+
+    cursor.execute(f"SELECT * FROM {table_name}")
+    data = cursor.fetchall()
+    df = pd.DataFrame(data, columns=columns)
+    
+    geo_chart = graphics.Geo_chart(latitude, longitude, describer)
+    graphJSON = geo_chart.create_chart(df, 'Mapa de calor')
+    header="Mapa de calor"
+    description = ""
+    return render_template('graphic.html', graphJSON=graphJSON, header=header,description=description)
+
+@app.route('/bubble_chart', methods=['GET'])
+def bubble_chart():
+    params = request.args
+    date = 'awaq_date'
+    id = 'awaq_common_name'
+    desc1 = params["column"]
+    desc2 = 'awaq_family'  
+
+    cursor.execute(f"SELECT * FROM {table_name}")
+    data = cursor.fetchall()
+    df = pd.DataFrame(data, columns=columns)
+    print(df)
+
+    bubble_chart = graphics.Bubble_chart(id,date, desc1, desc2)
+    graphJSON = bubble_chart.create_chart(df, 'Mapa de burbujas')
+    header="Mapa de burbujas"
+    description = ""
+    return render_template('graphic.html', graphJSON=graphJSON, header=header,description=description)
+
+@app.route('/trendline_chart', methods=['GET'])
+def trendline_chart():
+    params = request.args
+    date = 'awaq_date'
+    id = params["column"]
+
+    cursor.execute(f"SELECT * FROM {table_name}")
+    data = cursor.fetchall()
+    df = pd.DataFrame(data, columns=columns)
+    print(df)
+
+    trendline_chart = graphics.Trendline_chart(id,date)
+    graphJSON = trendline_chart.create_chart(df, 'Mapa de tendencia')
+    header="Mapa de tendencia"
+    description = ""
+    return render_template('graphic.html', graphJSON=graphJSON, header=header,description=description)
+
+
 @app.route('/var_getter', methods=['GET'])
 def var_getter():
+    params = request.args
     if not columns:
         return Response(mimetype="application/json", response=json.dumps({"code": "error", "details": "The data was not found on the server."}), status=404)
+    elif params["id"] in column_exceptions.keys():
+        return Response(mimetype="application/json", response=json.dumps({"code": "success", "columns": [column for column in columns if column not in column_exceptions[params["id"]]]}), status=200)
     return Response(mimetype="application/json", response=json.dumps({"code": "success", "columns": columns}), status=200)
 
 @app.errorhandler(NotFound)

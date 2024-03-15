@@ -50,6 +50,21 @@ class Geo_chart:
         ))
 
         fig.update_layout(title = title)
+
+        fig.update_layout(
+            title = title,
+            autosize=True,
+            height=500,
+            geo=dict(
+                center=dict(
+                    lat=5.20830,
+                    lon=-75.6667
+                ),
+                scope='south america',
+                projection_scale=5
+            )
+        )
+        
         graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return graphJSON
     
@@ -61,30 +76,30 @@ class Bubble_chart:
         self.color_column = color_column
 
     def create_chart(self, df, title):
-        df_count = df.groupby(self.group_columns).size().reset_index(name=self.count_column)
-        df_count[self.date_column] = pd.to_datetime(df_count[self.date_column], format="%d/%m/%Y")
-
-        fig = px.scatter(df_count,
+        df_count2 = df.groupby([self.date_column , self.group_columns, self.count_column, self.color_column]).size().reset_index(name='counts')
+        df_count2[self.date_column] = pd.to_datetime(df_count2[self.date_column], infer_datetime_format=True)
+        print(df_count2)
+        fig = px.scatter(df_count2,
                         x = self.date_column,
-                        y = self.count_column,
-                        size = self.count_column,
-                        color = self.color_column)
+                        y = 'counts',
+                        size = 'counts',
+                        color=self.count_column)
+        
+        fig.update_layout(title = title)
+        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        return graphJSON
+        
+class Trendline_chart:
+    def __init__(self, group_columns, date_column):
+        self.group_columns = group_columns
+        self.date_column = date_column
+
+    def create_chart(self, df, title):
+        df_count = df.groupby([self.date_column, self.group_columns]).size().reset_index(name='counts')
+        df_count[self.date_column] = pd.to_datetime(df_count[self.date_column], infer_datetime_format=True)
+
+        fig = px.scatter(df_count, x=self.date_column, y='counts', trendline="ols")
 
         fig.update_layout(title = title)
         graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return graphJSON
-    
-class Trendline_chart:
-    def __init__(self, group_columns, date_column, count_column):
-        self.group_columns = group_columns
-        self.date_column = date_column
-        self.count_column = count_column
-
-    def create_chart(self, df, title):
-        df_count = df.groupby(self.group_columns).size().reset_index(name=self.count_column)
-        df_count[self.date_column] = pd.to_datetime(df_count[self.date_column], format="%d/%m/%Y")
-
-        fig = px.scatter(df_count, x=self.date_column, y=self.count_column, trendline="ols")
-
-        fig.update_layout(title = title)
-        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
