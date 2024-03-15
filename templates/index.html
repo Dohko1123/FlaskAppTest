@@ -21,7 +21,7 @@
                 <div class="col-md-6 col-12">
                     <h2><a id="bar_chart" href="#" onclick="plotchart('bar_chart')">Gráfica de Barras</a></h2>
                     <h2><a id="pie_chart" href="#" onclick="plotchart('pie_chart')">Gráfica de Pastel</a></h2>
-                    <h2><a id="heat_map" href="/heat_map">Gráfica de Calor</a></h2>
+                    <h2><a id="heat_map" href="#" onclick="plotchart('heat_map')">Gráfica de Calor</a></h2>
                 </div>
                 <div class="col-md-6 col-12">
                     <h2><a id="bubble_chart" href="#" onclick="plotchart('bubble_chart')">Gráfica de Burbujas</a></h2>
@@ -36,16 +36,30 @@
         <div class="mt-5 ms-5 mb-5 me-5 px-auto" id="graphicgenerate" style="display: none">
             <h1 id="formtitle">Grafica de</h1>
             <form id="graphicform" action="" method="get">
-                <div class="col-md-4 col-12">
-                    <label class="col-form-label mt-2" for="select">Columna:</label>
-                </div>
-                <div class="col-md-4 col-12">
-                    <select class="form-select bg-dark text-light mt-2 mb-2" id="select" name="column"></select>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 col-12">
-                        <input class="btn-success" type="submit" value="Graficar">
-                        <input class="btn-warning" type="button" onclick="removeOptions()" href="#" value="Regresar a Inicio">
+                <div class="container">
+                    <div class="row">
+                        <div id="column1" class="col-md-6 col-12">
+                            <label class="col-form-label mt-2" for="select" id="select1label">Columna:</label>
+                            <select class="form-select bg-dark text-light mt-2 mb-2" id="select1" name="column1"></select>
+                        </div>
+                        <div id="column2" class="col-md-6 col-12" style="display: none">
+                            <label class="col-form-label mt-2" for="select2" id="select2label">Columna:</label>
+                            <select class="form-select bg-dark text-light mt-2 mb-2" id="select2" name="column2"></select>
+                        </div>
+                        <div id="column3" class="col-md-6 col-12" style="display: none">
+                            <label class="col-form-label mt-2" for="select3" id="select3label">Columna:</label>
+                            <select class="form-select bg-dark text-light mt-2 mb-2" id="select3" name="column3"></select>
+                        </div>
+                        <div id="column4" class="col-md-6 col-12" style="display: none">
+                            <label class="col-form-label mt-2" for="select4" id="select4label">Columna:</label>
+                            <select class="form-select bg-dark text-light mt-2 mb-2" id="select4" name="column4"></select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6 col-12">
+                            <input class="btn-success" type="submit" value="Graficar">
+                            <input class="btn-warning" type="button" onclick="removeOptions()" href="#" value="Regresar a Inicio">
+                        </div>
                     </div>
                 </div>
             </form>

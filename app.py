@@ -13,9 +13,12 @@ cursor = connection.get_cursor(conn)
 table_name = 'awaq'
 columns = connection.get_colums_names(cursor, table_name)
 
-column_exceptions = {
-    "bubble_chart": ["awaq_date", "awaq_common_name", "awaq_family"],
-    "trendline_chart": ["awaq_date"]
+cols_required = {
+    "bar_chart": ["Column"],
+    "pie_chart": ["Column"],
+    "heat_map": ["Longitude", "Latitude", "Describer"],
+    "bubble_chart": ["Date", "Column", "Describer 1", "Describer 2"],
+    "trendline_chart": ["Date", "Column"]
 }
 
 @app.route('/', methods=['GET'])
@@ -25,8 +28,8 @@ def index():
 @app.route('/bar_chart', methods=['GET'])
 def bar_chart():
     params = request.args
-    measure = params['column']
-    x_axis = params['column']
+    measure = params['column1']
+    x_axis = params['column1']
     y_axis = 'Cantidad'
     function = pd.Series
     color = 'blue'
@@ -45,7 +48,7 @@ def bar_chart():
 @app.route('/pie_chart', methods=['GET'])
 def pie_chart():
     params = request.args
-    dimesion = params['column']
+    dimesion = params['column1']
 
     cursor.execute(f"SELECT * FROM {table_name}")
     data = cursor.fetchall()
@@ -59,9 +62,10 @@ def pie_chart():
 
 @app.route('/heat_map', methods=['GET'])
 def heat_map():
-    longitude = 'awaq_longitude'
-    latitude = 'awaq_latitude'
-    describer = 'awaq_id'
+    params = request.args
+    longitude = params["column1"]
+    latitude = params["column2"]
+    describer = params["column3"]
 
     cursor.execute(f"SELECT * FROM {table_name}")
     data = cursor.fetchall()
@@ -76,10 +80,10 @@ def heat_map():
 @app.route('/bubble_chart', methods=['GET'])
 def bubble_chart():
     params = request.args
-    date = 'awaq_date'
-    id = 'awaq_common_name'
-    desc1 = params["column"]
-    desc2 = 'awaq_family'  
+    date = params["column1"]
+    id = params["column2"]
+    desc1 = params["column3"]
+    desc2 = params["column4"]
 
     cursor.execute(f"SELECT * FROM {table_name}")
     data = cursor.fetchall()
@@ -95,8 +99,8 @@ def bubble_chart():
 @app.route('/trendline_chart', methods=['GET'])
 def trendline_chart():
     params = request.args
-    date = 'awaq_date'
-    id = params["column"]
+    date = params["column1"]
+    id = params["column2"]
 
     cursor.execute(f"SELECT * FROM {table_name}")
     data = cursor.fetchall()
@@ -115,9 +119,7 @@ def var_getter():
     params = request.args
     if not columns:
         return Response(mimetype="application/json", response=json.dumps({"code": "error", "details": "The data was not found on the server."}), status=404)
-    elif params["id"] in column_exceptions.keys():
-        return Response(mimetype="application/json", response=json.dumps({"code": "success", "columns": [column for column in columns if column not in column_exceptions[params["id"]]]}), status=200)
-    return Response(mimetype="application/json", response=json.dumps({"code": "success", "columns": columns}), status=200)
+    return Response(mimetype="application/json", response=json.dumps({"code": "success", "columns": columns, "required": cols_required[params["id"]]}), status=200)
 
 @app.errorhandler(NotFound)
 def handle_exception(e):
